@@ -29,8 +29,7 @@ function Hero() {
         </div>
 
         <p className="mt-8 max-w-2xl mx-auto text-sm md:text-base text-slate-300">
-          Create autonomous AI agents that think, plan, and execute complex
-          tasks. Transform your business with intelligent automation.
+          Create autonomous AI agents that think, plan, and execute complex tasks. Transform your business with intelligent automation.
         </p>
 
         <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
