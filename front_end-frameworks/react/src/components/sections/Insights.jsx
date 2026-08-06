@@ -1,6 +1,8 @@
-import InsightCard from "../components/InsightCard";
-import { getInsights } from "../services/insightsService";
+import InsightCard from "../cards/InsightCard";
+import { getInsights } from "../../services/insightsService";
 import { useState, useEffect } from "react";
+import SectionBadge from "../ui/SectionBadge";
+import SectionTitle from "../ui/SectionTitle";
 
 function Insights() {
   const [insights, setInsights] = useState([]);
@@ -21,28 +23,21 @@ function Insights() {
 
   return (
     <section id="insights-section" className="py-24 bg-black">
-      {/*Eyebrow*/}
       <div className="text-center max-w-6xl mx-auto px-6">
-        <span className="inline-block px-4 py-2 text-xs text-violet-300 rounded-full border border-violet-500/20 bg-violet-500/10">
-          ✦ Insights ✦
-        </span>
+        <SectionBadge>Insights</SectionBadge>
 
-        {/*Title*/}
-        <h2 className="mt-8 text-4xl md:text-5xl font-black tracking-tight leading-none text-slate-50">
-          Explore Agentic AI
-          <br />
-          <span className="text-violet-300">Through real-world scenes</span>
-        </h2>
+        <div className="mt-8">
+          <SectionTitle
+            line1="Explore Agentic AI"
+            line2="Through real-world scenes"
+          />
+        </div>
       </div>
 
-      {/*Error message*/}
       {error && (
-        <p className="mt-6 text-center text-sm text-red-400">
-          {error}
-        </p>
+        <p className="mt-6 text-center text-sm text-red-400">{error}</p>
       )}
 
-      {/*Insights grid*/}
       <div className="mt-16 max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-8">
         {insights.map((insight, index) => (
           <InsightCard
