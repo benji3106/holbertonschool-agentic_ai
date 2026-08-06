@@ -4,15 +4,16 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-  "dev": "vite",
-  "lint": "eslint .",
-  "fix": "eslint . --fix",
-  "build": "vite build",
-  "preview": "vite preview",
-  "deploy": "npm run build && gh-pages -d dist"
+    "dev": "vite",
+    "lint": "eslint .",
+    "fix": "eslint . --fix",
+    "build": "vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && gh-pages -d dist"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "bootstrap-icons": "^1.13.1",
     "lucide-react": "^1.28.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
