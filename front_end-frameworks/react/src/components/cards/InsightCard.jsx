@@ -1,7 +1,7 @@
 function InsightCard({ category, title, description, image, index }) {
   return (
     <article
-      className={`relative overflow-hidden rounded-3xl border border-slate-800 shadow-xl shadow-slate-950/40 h-80 ${
+      className={`relative overflow-hidden rounded-3xl border border-slate-800 shadow-xl shadow-slate-950/40 h-80 hover:[&>img]:scale-110 hover:[&>img]:brightness-50 ${
         index === 0 ? "md:col-span-2" : ""
       }`}
     >
