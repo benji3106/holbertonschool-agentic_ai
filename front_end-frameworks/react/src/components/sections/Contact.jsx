@@ -30,7 +30,10 @@ function Contact() {
   };
 
   return (
-    <section id="contact-section" className="py-24 bg-black">
+    <section
+      id="hero-section"
+      className="relative isolate pt-36 pb-24 overflow-hidden bg-slate-950"
+    >
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center">
           <SectionBadge>Start your AI journey</SectionBadge>

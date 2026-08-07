@@ -14,7 +14,7 @@ function Hero() {
   return (
     <section
       id="hero-section"
-      className="relative pt-36 pb-24 overflow-hidden bg-slate-950"
+      className="relative isolate pt-36 pb-24 overflow-hidden bg-slate-950"
     >
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(139,92,246,0.25),transparent_60%)]" />
