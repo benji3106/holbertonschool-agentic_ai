@@ -3,7 +3,7 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  base: '/holbertonschool-agentic_ai/react/',
+  base: '/holbertonschool-agentic_ai/front_end-frameworks/react/',
   plugins: [
     react(),
     tailwindcss()

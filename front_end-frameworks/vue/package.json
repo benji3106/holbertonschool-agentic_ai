@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://benji3106.github.io/holbertonschool-agentic_ai/vue/",
+  "homepage": "https://benji3106.github.io/holbertonschool-agentic_ai/front_end-frameworks/vue/",
   "scripts": {
   "dev": "vite",
   "build": "vite build",
@@ -11,7 +11,7 @@
   "fix": "eslint . --fix",
   "preview": "vite preview",
   "predeploy": "npm run build",
-  "deploy": "gh-pages -d dist -e vue"
+  "deploy": "gh-pages -d dist --dest front_end-frameworks/vue --add"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

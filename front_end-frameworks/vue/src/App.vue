@@ -1,11 +1,21 @@
 <script setup>
-import { Rocket } from 'lucide-vue-next'
+import Header from "./components/layout/Header.vue";
+import Hero from "./components/sections/Hero.vue";
+import About from "./components/sections/About.vue";
+import Features from "./components/sections/Features.vue";
+import Insights from "./components/sections/Insights.vue";
+import Contact from "./components/sections/Contact.vue";
+import Footer from "./components/layout/Footer.vue";
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-center px-4">
-    <Rocket class="w-12 h-12 text-blue-600 mb-4" />
-    <h1 class="text-4xl font-bold text-gray-900">Mon Super Projet Vue</h1>
-    <h2 class="text-lg text-gray-500 mt-2">Configuration initiale terminée 🎉</h2>
-  </div>
+  <Header />
+  <main>
+    <Hero />
+    <About />
+    <Features />
+    <Insights />
+    <Contact />
+  </main>
+  <Footer />
 </template>

@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
   plugins: [vue(), tailwindcss()],
-  base: '/holbertonschool-agentic_ai/vue/',
+  base: '/holbertonschool-agentic_ai/front_end-frameworks/vue/',
   server: {
     host: '0.0.0.0',
     port: 3000,

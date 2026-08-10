@@ -3,14 +3,14 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://benji3106.github.io/holbertonschool-agentic_ai/react/",
+  "homepage": "https://benji3106.github.io/holbertonschool-agentic_ai/front_end-frameworks/react/",
   "scripts": {
     "dev": "vite",
     "lint": "eslint .",
     "fix": "eslint . --fix",
     "build": "vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist -e react"
+    "deploy": "npm run build && gh-pages -d dist --dest front_end-frameworks/react --add"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
