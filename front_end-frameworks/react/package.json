@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://benji3106.github.io/holbertonschool-agentic_ai/react/",
   "scripts": {
     "dev": "vite",
     "lint": "eslint .",
