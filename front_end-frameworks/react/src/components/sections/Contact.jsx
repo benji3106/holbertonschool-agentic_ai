@@ -31,7 +31,7 @@ function Contact() {
 
   return (
     <section
-      id="hero-section"
+      id="contact-section"
       className="relative isolate pt-36 pb-24 overflow-hidden bg-slate-950"
     >
       <div className="max-w-6xl mx-auto px-6">
