@@ -20,8 +20,11 @@ const db = {
  * À refactoriser par l'IA en mode Agent (Edits)
  */
 function authenticateUser(email, password) {
-    // FAILLE CRITIQUE : Injection SQL par concaténation de chaînes
-    const sql = "SELECT * FROM users WHERE email = '" + email + "' AND password = '" + password + "'";
+    // Neutralise les apostrophes SQL en les échappant avant la concaténation.
+    const neutralizeSql = (value) => String(value).replace(/'/g, "''");
+    const safeEmail = neutralizeSql(email);
+    const safePassword = neutralizeSql(password);
+    const sql = "SELECT * FROM users WHERE email = '" + safeEmail + "' AND password = '" + safePassword + "'";
     
     const results = db.query(sql);
 
