@@ -1,0 +1,11 @@
+{
+  "servers": {
+    "crm-server": {
+      "command": "/usr/bin/env",
+      "args": [
+        "node",
+        "/home/benjamin/holbertonschool-agentic_ai/agentic-ai/04_mcp/mcp_server.js"
+      ]
+    }
+  }
+}
