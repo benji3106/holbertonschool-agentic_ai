@@ -1,0 +1,10 @@
+{
+  "servers": {
+    "github-ops": {
+      "type": "stdio",
+      "command": "/usr/bin/env",
+      "args": ["node", "/home/benjamin/holbertonschool-agentic_ai/agentic-ai/05_sentinel/mcp_server.js"],
+      "envFile": "/home/benjamin/holbertonschool-agentic_ai/agentic-ai/05_sentinel/.env"
+    }
+  }
+}
