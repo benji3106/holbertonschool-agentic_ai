@@ -1,27 +1,25 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Tableau de suivi des issues de microsoft/vscode" />
-    <title>Sentinel / VS Code issues</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div class="app-shell">
-      <aside class="sidebar">
-        <a class="brand" href="https://github.com/microsoft/vscode" target="_blank" rel="noreferrer"><span class="brand-mark">S</span><span><strong>Sentinel</strong><small>repository watch</small></span></a>
-        <div class="repo-card"><span class="eyebrow">REPOSITORY</span><strong>microsoft / vscode</strong><span class="live-dot">● synchronisé maintenant</span></div>
-        <nav class="nav-links" aria-label="Navigation principale"><a class="active" href="#issues"><span>▦</span> Issues <b id="nav-count">5</b></a><a href="https://github.com/microsoft/vscode/pulls" target="_blank" rel="noreferrer"><span>↗</span> Pull requests</a><a href="https://github.com/microsoft/vscode/projects" target="_blank" rel="noreferrer"><span>□</span> Projects</a></nav>
-        <div class="sidebar-foot"><span class="eyebrow">SOURCE</span><p>GitHub MCP<br /><strong>fetch_github_issues</strong></p><span class="timestamp">10 sept. 2026 · 16:31 UTC</span></div>
-      </aside>
-      <main class="main-content" id="issues">
-        <header class="page-header"><div><p class="kicker">OPERATIONS / ISSUE INTELLIGENCE</p><h1>Issue watch</h1><p class="subtitle">Les cinq derniers signalements ouverts de VS Code, prêts à être triés.</p></div><a class="github-link" href="https://github.com/microsoft/vscode/issues" target="_blank" rel="noreferrer">Voir sur GitHub <span>↗</span></a></header>
-        <section class="metrics" aria-label="Résumé des issues"><article class="metric accent"><span>Ouvertes</span><strong id="open-count">5</strong><small>issues suivies</small></article><article class="metric"><span>Avec label</span><strong id="label-count">4</strong><small>catégorisées</small></article><article class="metric"><span>Assignées</span><strong id="assigned-count">3</strong><small>en cours de triage</small></article><article class="metric"><span>Commentaires</span><strong id="comment-count">1</strong><small>sur la sélection</small></article></section>
-        <section class="toolbar" aria-label="Filtres des issues"><label class="search-field"><span>⌕</span><input id="search" type="search" placeholder="Rechercher une issue, un auteur..." /></label><label class="select-field"><span>Label</span><select id="label-filter"><option value="all">Tous les labels</option></select></label><label class="select-field"><span>Trier par</span><select id="sort"><option value="newest">Plus récentes</option><option value="oldest">Plus anciennes</option><option value="number">Numéro d’issue</option></select></label><span class="result-count" id="result-count">5 résultats</span></section>
-        <section class="issue-list" id="issue-list" aria-live="polite"></section><p class="empty-state" id="empty-state" hidden>Aucune issue ne correspond à ces filtres.</p>
-      </main>
-    </div>
-    <script src="app.js"></script>
-  </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>microsoft/vscode issues</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="dashboard">
+    <header class="masthead">
+      <p class="eyebrow">microsoft / vscode</p>
+      <h1>Issues</h1>
+      <div class="toolbar" aria-label="Issue controls">
+        <label class="search-box">
+          <span>Rechercher</span>
+          <input id="search" type="search" placeholder="Titre, auteur, label..." autocomplete="off">
+        </label>
+      </div>
+    </header>
+    <section id="issues" class="issue-grid" aria-live="polite"></section>
+  </main>
+  <script src="app.js"></script>
+</body>
 </html>
