@@ -1,4 +1,4 @@
-# Standards de code — Projet Sentinel
+# Standards de code Projet Sentinel
 
 ## Stack
 - JavaScript natif (ES2022+), HTML5 et CSS3 purs.
