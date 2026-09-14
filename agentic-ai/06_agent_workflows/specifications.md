@@ -32,15 +32,16 @@ Le service ne modifie jamais `tasks.json` et ne change pas le statut des tâches
 ## Cas particuliers
 
 - Aucune tâche `pending` : afficher un message explicite indiquant qu’aucune tâche n’est disponible.
-- Fichier absent ou illisible : afficher une erreur explicite et arrêter le service avec un état d’échec.
-- JSON invalide : afficher une erreur explicite et arrêter le service avec un état d’échec.
+- Fichier absent ou illisible au démarrage : afficher une erreur explicite et arrêter le service avec un état d’échec.
+- JSON invalide au démarrage : afficher une erreur explicite et arrêter le service avec un état d’échec.
+- Fichier absent, illisible ou JSON invalide après un démarrage réussi : afficher l’erreur, attendre le cycle suivant et reprendre la lecture sans arrêter le service.
 - Tâche sans `action` ou sans `status` : considérer le fichier comme invalide.
 - Les statuts différents de `pending` doivent être ignorés.
 
 ## Exigences Docker
 
 - Le service doit être exécuté dans un conteneur Docker.
-- `tasks.json` doit être fourni au conteneur par montage de volume ou être intégré à l’image.
+- `tasks.json` doit être fourni au conteneur par montage de volume en lecture seule afin que ses mises à jour soient visibles sans reconstruction de l’image.
 - Le conteneur doit utiliser une image légère et démarrer le service comme processus principal.
 - La commande de lancement documentée est `docker compose up --build`.
 - Le processus principal du conteneur doit rester actif afin d’assurer la boucle périodique.
@@ -57,5 +58,5 @@ Le service ne modifie jamais `tasks.json` et ne change pas le statut des tâches
 - Si toutes les tâches sont terminées, un message “aucune tâche pending” est affiché.
 - Une modification du fichier est visible sans redémarrer le conteneur.
 - Le conteneur démarre avec une seule commande documentée.
-- Une erreur de fichier ou de format est clairement visible dans les logs et provoque l’arrêt du conteneur.
+- Une erreur de fichier ou de format au démarrage est clairement visible dans les logs et provoque l’arrêt du conteneur ; une erreur transitoire après démarrage est journalisée et le service reprend au cycle suivant.
 - Le comportement reste identique après plusieurs cycles successifs.

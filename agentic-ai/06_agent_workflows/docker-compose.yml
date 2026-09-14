@@ -1,5 +1,14 @@
 services:
   scheduler:
     build: .
+    user: node
+    init: true
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev
     volumes:
       - ./tasks.json:/app/tasks.json:ro

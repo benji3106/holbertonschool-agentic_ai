@@ -76,16 +76,27 @@ function waitForNextCycle() {
 }
 
 async function run() {
-  while (!stopping) {
-    const tasks = await readTasks();
-    const pendingTask = tasks.find((task) => task.status === 'pending');
+  let firstCycle = true;
 
-    if (pendingTask) {
-      console.log(pendingTask.action);
-    } else {
-      console.log('Aucune tâche pending disponible.');
+  while (!stopping) {
+    try {
+      const tasks = await readTasks();
+      const pendingTask = tasks.find((task) => task.status === 'pending');
+
+      if (pendingTask) {
+        console.log(pendingTask.action);
+      } else {
+        console.log('Aucune tâche pending disponible.');
+      }
+    } catch (error) {
+      if (firstCycle) {
+        throw error;
+      }
+
+      console.error(`Erreur de lecture des tâches: ${error.message}`);
     }
 
+    firstCycle = false;
     await waitForNextCycle();
   }
 }
