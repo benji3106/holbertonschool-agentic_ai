@@ -41,6 +41,8 @@ Le service ne modifie jamais `tasks.json` et ne change pas le statut des tâches
 
 - Le service doit être exécuté dans un conteneur Docker.
 - `tasks.json` doit être fourni au conteneur par montage de volume ou être intégré à l’image.
+- Le conteneur doit utiliser une image légère et démarrer le service comme processus principal.
+- La commande de lancement documentée est `docker compose up --build`.
 - Le processus principal du conteneur doit rester actif afin d’assurer la boucle périodique.
 - Les messages doivent être écrits sur la sortie standard ou la sortie d’erreur du conteneur.
 - L’arrêt du conteneur doit interrompre proprement la boucle.
@@ -50,6 +52,7 @@ Le service ne modifie jamais `tasks.json` et ne change pas le statut des tâches
 
 - Au démarrage avec le fichier actuel, la console affiche `sync_database`.
 - Le fichier est relu toutes les 5 secondes environ.
+- Chaque cycle traite au plus une tâche : la première tâche `pending` selon l’ordre du tableau.
 - Si `sync_database` passe à `done`, le cycle suivant affiche `clear_cache`.
 - Si toutes les tâches sont terminées, un message “aucune tâche pending” est affiché.
 - Une modification du fichier est visible sans redémarrer le conteneur.

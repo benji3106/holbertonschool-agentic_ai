@@ -1,0 +1,10 @@
+{
+  "name": "task-scheduler",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Service Docker de lecture périodique des tâches pending",
+  "main": "scheduler.js",
+  "scripts": {
+    "start": "node scheduler.js"
+  }
+}

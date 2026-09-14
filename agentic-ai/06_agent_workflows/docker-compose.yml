@@ -1,0 +1,5 @@
+services:
+  scheduler:
+    build: .
+    volumes:
+      - ./tasks.json:/app/tasks.json:ro
