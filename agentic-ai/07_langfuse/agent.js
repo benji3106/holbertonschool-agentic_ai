@@ -1,15 +1,21 @@
 import OpenAI from "openai";
-import { observeOpenAI } from "langfuse";
+import { Langfuse, observeOpenAI } from "langfuse";
 import dotenv from "dotenv";
+import { randomUUID } from "crypto";
 
 dotenv.config();
 
+const langfuse = new Langfuse();
+
+const traceId = randomUUID();
 
 const rawClient = new OpenAI({
     baseURL: "https://generativelanguage.googleapis.com/v1beta/openai/",
     apiKey: process.env.GEMINI_API_KEY
 });
+
 const openai = observeOpenAI(rawClient, {
+    traceId: traceId,
     traceName: "agent-sysadmin",
     generationName: "proposition-commande-linux",
     tags: ["tp7", "sysadmin"],
@@ -28,14 +34,32 @@ async function main() {
 
     const intentionIA = response.choices[0].message.content;
 
-    // ATTENTION DANGER : L'IA propose une commande, et ici nous pourrions l'exécuter aveuglément !
     console.log("\nL'IA a généré cette commande :", intentionIA);
-    console.log("Tokens consommés :", response.usage.total_tokens);
 
-    // TODO Tâche 2 : Ajouter le Post-Hook FinOps (Vérifier si usage.total_tokens > 150)
-    // TODO Tâche 2 : Ajouter le Scoring Langfuse ("securite_commande")
-    // TODO Tâche 3 : Implémenter le Pre-Hook HITL avant la fin du script pour demander autorisation
+    const totalTokens = response.usage.total_tokens;
+    console.log("Tokens consommés :", totalTokens);
+
+    if (totalTokens > 150) {
+        console.error("ALERTE FINOPS : Seuil de tokens dépassé !");
+    }
+
+    const estDangereux = intentionIA.includes("rm -rf");
+
+    langfuse.score({
+        traceId: traceId,
+        name: "securite_commande",
+        value: estDangereux ? 0 : 1,
+        comment: estDangereux
+            ? "Commande destructrice détectée (rm -rf)"
+            : "Aucune commande destructrice détectée"
+    });
+
+    console.log("Score sécurité :", estDangereux ? "0 (Critique)" : "1 (Safe)");
+
+    // TODO Tâche 3 : Pre-Hook HITL
+
     await openai.flushAsync();
+    await langfuse.flushAsync();
 }
 
 main();
