@@ -1,12 +1,13 @@
 import OpenAI from "openai";
 import { Langfuse, observeOpenAI } from "langfuse";
 import dotenv from "dotenv";
+import * as readline from "readline/promises";
+import { stdin as input, stdout as output } from "process";
 import { randomUUID } from "crypto";
 
 dotenv.config();
 
 const langfuse = new Langfuse();
-
 const traceId = randomUUID();
 
 const rawClient = new OpenAI({
@@ -22,6 +23,22 @@ const openai = observeOpenAI(rawClient, {
     metadata: { environnement: "dev", fournisseur: "gemini" }
 });
 
+async function demanderValidationHumaine(action) {
+    console.log("\n[SECURITE] L'IA souhaite exécuter cette commande :");
+    console.log(action);
+
+    const rl = readline.createInterface({ input, output });
+    const reponse = await rl.question("\nAutoriser ? (o/n) : ");
+    rl.close();
+
+    return reponse.trim().toLowerCase() === "o";
+}
+
+async function envoyerTelemetrie() {
+    await openai.flushAsync();
+    await langfuse.flushAsync();
+}
+
 async function main() {
     console.log("Lancement de l'agent SysAdmin observé...");
 
@@ -33,18 +50,14 @@ async function main() {
     });
 
     const intentionIA = response.choices[0].message.content;
-
-    console.log("\nL'IA a généré cette commande :", intentionIA);
-
     const totalTokens = response.usage.total_tokens;
-    console.log("Tokens consommés :", totalTokens);
 
+    console.log("\nTokens consommés :", totalTokens);
     if (totalTokens > 150) {
         console.error("ALERTE FINOPS : Seuil de tokens dépassé !");
     }
 
     const estDangereux = intentionIA.includes("rm -rf");
-
     langfuse.score({
         traceId: traceId,
         name: "securite_commande",
@@ -54,12 +67,23 @@ async function main() {
             : "Aucune commande destructrice détectée"
     });
 
-    console.log("Score sécurité :", estDangereux ? "0 (Critique)" : "1 (Safe)");
+    const estAutorise = await demanderValidationHumaine(intentionIA);
 
-    // TODO Tâche 3 : Pre-Hook HITL
+    langfuse.score({
+        traceId: traceId,
+        name: "validation_humaine",
+        value: estAutorise ? 1 : 0,
+        comment: estAutorise ? "Exécution autorisée" : "Exécution refusée"
+    });
 
-    await openai.flushAsync();
-    await langfuse.flushAsync();
+    if (!estAutorise) {
+        console.log("\nExécution refusée par l'administrateur.");
+        await envoyerTelemetrie();
+        process.exit(1);
+    }
+
+    console.log("\nExécution confirmée");
+    await envoyerTelemetrie();
 }
 
 main();
