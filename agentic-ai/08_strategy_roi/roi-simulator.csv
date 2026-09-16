@@ -1,0 +1,4 @@
+Tâche, Taux Horaire Dev (€), Heures Manuelles, Coût Tokens Agent (€), Heures Humain+Agent, Total Classique (€), Total Agentic (€), Économie Réalisée (€)
+Module Authentification, 50, 32, 2.50, 4, 1600.00, 202.50, 1397.50
+Script de Migration BDD, 50, 16, 12.00, 3, 800.00, 162.00, 638.00
+Refactoring Legacy Code, 60, 40, 25.00, 10, 2400.00, 625.00, 1775.00
