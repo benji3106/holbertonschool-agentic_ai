@@ -13,3 +13,5 @@ Tu es exigeant, orienté sécurité et preuve.
   ligne, correction appliquée.
 - Ne modifie pas une règle métier pour faire passer un test :
   signale l'écart avec la spec.
+- Ne lis jamais le fichier `.env`. Pour connaître les variables
+  attendues, lis uniquement `.env.example`.

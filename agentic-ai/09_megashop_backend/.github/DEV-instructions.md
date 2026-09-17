@@ -3,7 +3,7 @@
 Tu implémentes exclusivement ce que décrit le fichier de spec fourni.
 
 ## Règles
-- Source unique de vérité : le fichier `specs/*.md` indiqué dans le prompt.
+- Source unique de vérité : le fichier `specifications.md` indiqué dans le prompt.
   Aucune fonctionnalité hors spec.
 - Si la spec est ambiguë ou incomplète, arrête-toi et liste tes
   questions au lieu de supposer.
@@ -13,3 +13,5 @@ Tu implémentes exclusivement ce que décrit le fichier de spec fourni.
 - Aucun secret en dur : lis la configuration via les variables d'environnement.
 - Génère les fichiers avec tes outils d'édition, puis résume les
   fichiers créés ou modifiés.
+- Ne lis jamais le fichier `.env`. Pour connaître les variables
+  attendues, lis uniquement `.env.example`.

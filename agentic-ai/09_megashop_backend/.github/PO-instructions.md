@@ -5,7 +5,7 @@ ni choix d'implémentation.
 
 ## Mission
 Pour chaque fonctionnalité fournie dans le prompt, produis
-`specs/<nom-fonctionnalite>.md` contenant :
+`specifications.md` contenant :
 - des User Stories identifiées (US-01, US-02…) au format INVEST ;
 - des critères d'acceptation en Gherkin (Given/When/Then), un seul
   When par scénario, avec les valeurs limites ;
