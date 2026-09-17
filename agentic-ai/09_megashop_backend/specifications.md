@@ -5,6 +5,7 @@ Le système reçoit une notification de paiement envoyée par une banque. Il enr
 
 ## 2. Décisions validées par le lead
 - Payload invalide : un payload vide, non JSON ou structurellement invalide est accepté par le webhook pour la réception, tracé dans la console et suivi d'une réponse HTTP 200 OK. Le système ne doit pas bloquer la banque par un code d'erreur, afin d'éviter les relances inutiles.
+- Taille du corps : un corps de requête supérieur à 1 Mo est rejeté avec le statut HTTP 413 Payload Too Large, afin de protéger le service contre la saturation mémoire. Ce cas ne correspond à aucune notification bancaire légitime.
 - Contenu de la trace : chaque entrée de console contient, au minimum, le horodatage UTC de réception, la méthode HTTP, le corps brut reçu et le statut HTTP renvoyé. Les traces sont destinées au diagnostic technique et à l'audit de réception.
 - Doublons : hors périmètre du Sprint 1. Le système ne fait ni déduplication ni filtrage de doublons.
 
@@ -27,6 +28,12 @@ INVEST : Independent, Negotiable, Valuable, Estimable, Small, Testable.
 
 ## 4. Critères d'acceptation (Gherkin)
 
+### Scenario — Rejet d'un corps de requête trop volumineux
+Given le webhook est disponible
+When la banque envoie une requête dont le corps dépasse 1 Mo
+Then le système rejette la requête avec le statut HTTP 413 Payload Too Large
+And le service ne traite pas cette requête comme une notification bancaire légitime
+
 ### Scenario Outline — Réception d'une notification envoyée par la banque
 Given le webhook est disponible
 When la banque envoie une notification de paiement au webhook avec <corps_envoye>
@@ -45,10 +52,11 @@ Examples:
 
 ## 5. Critères mesurables
 - Le système doit enregistrer une trace dans la console pour chaque requête reçue, y compris lorsque le payload est vide, invalide ou non conforme au format attendu.
-- La trace doit inclure au minimum : horodatage UTC, méthode HTTP, corps brut reçu et statut HTTP 200 OK.
-- Le webhook doit répondre avec le statut HTTP 200 OK dans un délai maximal de 1 seconde après réception de la requête.
-- Le système ne doit pas renvoyer un statut différent de 200 OK pour les notifications de paiement traitées dans le périmètre du Sprint 1.
+- La trace doit inclure au minimum : horodatage UTC, méthode HTTP, corps brut reçu et statut HTTP renvoyé (200 OK pour les notifications acceptées, 413 Payload Too Large pour les corps dépassant 1 Mo).
+- Le webhook doit répondre avec le statut HTTP 200 OK dans un délai maximal de 1 seconde après réception de la requête pour les notifications de paiement autorisées dans le périmètre du Sprint 1.
+- Un corps de requête supérieur à 1 Mo est rejeté avec le statut HTTP 413 Payload Too Large et ne doit pas être traité comme une notification bancaire légitime.
+- Le système ne doit pas renvoyer un statut différent de 200 OK pour les notifications de paiement traitées dans le périmètre du Sprint 1, sauf pour le cas de requête supérieure à 1 Mo explicitement rejetée avec HTTP 413.
 - Les doublons ne sont ni détectés ni traités dans ce sprint et ne font pas partie des critères de validation.
 
 ## 6. Critère de réussite fonctionnel
-La fonctionnalité est considérée comme satisfaite lorsque le webhook reçoit une notification provenant de la banque, enregistre une trace exploitable dans la console et répond systématiquement avec un statut HTTP 200 OK dans le délai défini, y compris pour les payloads invalides, sans prise en charge de la déduplication dans le Sprint 1.
+La fonctionnalité est considérée comme satisfaite lorsque le webhook reçoit une notification provenant de la banque, enregistre une trace exploitable dans la console et répond systématiquement avec un statut HTTP 200 OK dans le délai défini, y compris pour les payloads invalides, sauf pour les requêtes dont le corps dépasse 1 Mo, qui doivent être rejetées avec le statut HTTP 413 Payload Too Large, sans prise en charge de la déduplication dans le Sprint 1.

@@ -3,6 +3,8 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const MAX_REQUEST_BODY_SIZE = 1024 * 1024;
+
 const createApp = () => {
   const app = express();
 
@@ -10,14 +12,46 @@ const createApp = () => {
 
   app.use((req, res, next) => {
     let rawBody = '';
+    let receivedBytes = 0;
 
     req.setEncoding('utf8');
 
+    const rejectBodyTooLarge = () => {
+      const timestamp = new Date().toISOString();
+      console.error(JSON.stringify({
+        timestamp,
+        method: req.method,
+        rawBody,
+        statusCode: 413,
+        error: 'Request body too large'
+      }));
+
+      if (!res.headersSent) {
+        res.status(413).json({
+          status: 'error',
+          message: 'Request body too large'
+        });
+      }
+
+      req.destroy();
+    };
+
     req.on('data', (chunk) => {
+      receivedBytes += Buffer.byteLength(chunk);
+
+      if (receivedBytes > MAX_REQUEST_BODY_SIZE) {
+        rejectBodyTooLarge();
+        return;
+      }
+
       rawBody += chunk;
     });
 
     req.on('end', () => {
+      if (res.writableEnded || res.headersSent) {
+        return;
+      }
+
       req.rawBody = rawBody;
       next();
     });
@@ -31,7 +65,9 @@ const createApp = () => {
         statusCode: 200,
         error: error.message
       }));
-      res.status(200).send();
+      if (!res.headersSent) {
+        res.status(200).send();
+      }
     });
   });
 
