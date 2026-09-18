@@ -8,6 +8,25 @@ dotenv.config();
 const MAX_REQUEST_BODY_SIZE = 1024 * 1024;
 const QUEUE_NAME = process.env.QUEUE_NAME || 'payment_notifications';
 
+async function waitForRedis(redis, { maxAttempts = 30, intervalMs = 500 } = {}) {
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      await redis.ping();
+      return;
+    } catch (error) {
+      lastError = error;
+      if (attempt === maxAttempts) {
+        throw new Error(`Redis not available after ${maxAttempts} attempts: ${error.message}`);
+      }
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
+    }
+  }
+
+  throw lastError || new Error('Redis did not become ready');
+}
+
 const createApp = ({ publishNotification = async () => {} } = {}) => {
   const app = express();
 
@@ -24,7 +43,7 @@ const createApp = ({ publishNotification = async () => {} } = {}) => {
       console.error(JSON.stringify({
         timestamp,
         method: req.method,
-        rawBody,
+        bodySize: receivedBytes,
         statusCode: 413,
         error: 'Request body too large'
       }));
@@ -129,8 +148,10 @@ const createApp = ({ publishNotification = async () => {} } = {}) => {
   return app;
 };
 
-const startServer = () => {
+const startServer = async () => {
   const redis = new Redis(process.env.REDIS_URL || 'redis://127.0.0.1:6379');
+  await waitForRedis(redis);
+
   const app = createApp({
     publishNotification: ({ id, rawBody }) => redis.lpush(
       QUEUE_NAME,
@@ -139,18 +160,23 @@ const startServer = () => {
   });
   const port = Number(process.env.PORT || 3000);
 
-  app.listen(port, () => {
-    console.log(`Webhook listening on port ${port}`);
+  return new Promise((resolve) => {
+    const server = app.listen(port, () => {
+      console.log(`Webhook listening on port ${port}`);
+      resolve({ app, redis, server });
+    });
   });
-
-  return { app, redis };
 };
 
 if (require.main === module) {
-  startServer();
+  startServer().catch((error) => {
+    console.error(JSON.stringify({ status: 'echec', error: error.message }));
+    process.exitCode = 1;
+  });
 }
 
 module.exports = {
   createApp,
-  startServer
+  startServer,
+  waitForRedis
 };

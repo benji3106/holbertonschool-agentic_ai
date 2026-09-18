@@ -124,6 +124,21 @@ async function processNotification(message, llmClient) {
 // US-05 - Analyse asynchrone de la transaction
 async function startWorker() {
   const redis = new Redis(process.env.REDIS_URL || 'redis://127.0.0.1:6379');
+  let lastError = null;
+
+  for (let attempt = 1; attempt <= 30; attempt += 1) {
+    try {
+      await redis.ping();
+      break;
+    } catch (error) {
+      lastError = error;
+      if (attempt === 30) {
+        throw new Error(`Redis not available after 30 attempts: ${error.message}`);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  }
+
   initializeLangfuseTracing();
   const llmClient = createLlmClient();
 

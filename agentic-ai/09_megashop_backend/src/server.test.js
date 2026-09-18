@@ -3,7 +3,23 @@ const assert = require('node:assert/strict');
 const { readFileSync } = require('node:fs');
 const path = require('node:path');
 
-const { createApp } = require('./server.js');
+const { createApp, waitForRedis } = require('./server.js');
+
+test('US-08 - startup waits for Redis to become healthy before processing', async () => {
+  let attempts = 0;
+  const redis = {
+    ping: async () => {
+      attempts += 1;
+      if (attempts < 3) {
+        throw new Error('ECONNREFUSED');
+      }
+      return 'PONG';
+    }
+  };
+
+  await waitForRedis(redis, { maxAttempts: 5, intervalMs: 0 });
+  assert.equal(attempts, 3);
+});
 
 test('US-01 - webhook accepts a valid payment notification', async () => {
   const app = createApp();
@@ -82,6 +98,10 @@ test('US-03 - webhook returns 200 OK immediately for empty, malformed and non-ob
 test('SEC-01 - webhook rejects oversized request bodies before processing them', async () => {
   const app = createApp();
   const server = app.listen(0);
+  const originalError = console.error;
+  const errors = [];
+
+  console.error = (...args) => errors.push(args.join(' '));
 
   try {
     const port = server.address().port;
@@ -95,7 +115,15 @@ test('SEC-01 - webhook rejects oversized request bodies before processing them',
     });
 
     assert.equal(response.status, 413, 'Expected 413 for oversized request body');
+    assert.ok(errors.length >= 1, 'Expected a rejection trace');
+
+    const trace = JSON.parse(errors[errors.length - 1]);
+    assert.equal(trace.statusCode, 413, 'Expected 413 in the rejection trace');
+    assert.ok(trace.bodySize > 1024 * 1024, 'Expected the byte count at rejection time to exceed the 1 MiB limit');
+    assert.ok(trace.bodySize <= Buffer.byteLength(oversizedBody), 'Expected the logged size to be within the received byte count');
+    assert.ok(!Object.prototype.hasOwnProperty.call(trace, 'rawBody'), 'Raw body must not be logged for oversized requests');
   } finally {
+    console.error = originalError;
     await new Promise((resolve) => server.close(resolve));
   }
 });

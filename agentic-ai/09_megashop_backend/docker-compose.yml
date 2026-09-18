@@ -2,6 +2,7 @@ services:
   webhook:
     build: .
     command: node src/server.js
+    restart: unless-stopped
     env_file:
       - .env
     ports:
@@ -25,6 +26,7 @@ services:
   worker:
     build: .
     command: node src/worker.js
+    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -44,6 +46,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
