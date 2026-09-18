@@ -331,7 +331,7 @@ Corrections issues des audits QA, chacune vérifiée en exécution :
 | Exécution en root | `USER node` | `docker compose exec worker whoami` → `node` |
 | Build non reproductible | `npm ci` au lieu de `npm install` | Lockfile respecté |
 | Sources modifiables à l'exécution | `COPY --chown=root:root` | `touch /app/src/server.js` refusé |
-| Secrets dans l'image | `.env` dans `.dockerignore` | — |
+| Secrets dans l'image | `.env` dans `.dockerignore` |  |
 | Absence de limite de requête | Rejet à 1 Mo avec `413` | `bodySize` tracé, corps non journalisé |
 
 ---
