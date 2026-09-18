@@ -183,3 +183,93 @@ And le Worker peut consommer la file d'attente fournie par Redis
 - Délai maximal de traitement du Worker.
 - Politique de conservation des messages.
 - Déduplication.
+
+## 9. Sprint 3 — Validation humaine avant remboursement
+
+### 9.1 Objectif
+
+Le Worker peut traiter une notification dont le corps JSON comporte un champ `action` avec la valeur `refund`. Dans ce cas, avant d'appliquer un remboursement, le traitement est suspendu et une confirmation humaine est demandée sur un terminal interactif. La décision de l'opérateur est ensuite enregistrée dans Langfuse, rattachée à la trace du traitement concerné, avec un statut de succès si l'autorisation est accordée et un statut d'échec si l'autorisation est refusée.
+
+### 9.2 User Stories (INVEST)
+
+#### US-08 — Détection d'une action de remboursement
+
+En tant que système MegaShop, je veux détecter une notification dont le champ `action` vaut `refund` afin d'appliquer la logique de validation spécifique au remboursement.
+
+INVEST : Independent, Negotiable, Valuable, Estimable, Small, Testable.
+
+#### US-09 — Validation humaine avant remboursement
+
+En tant qu'opérateur MegaShop, je veux confirmer ou annuler une action de remboursement avant son application afin d'éviter un remboursement non autorisé.
+
+INVEST : Independent, Negotiable, Valuable, Estimable, Small, Testable.
+
+#### US-10 — Enregistrement de la décision dans Langfuse
+
+En tant qu'équipe de supervision, je veux que la décision humaine soit enregistrée dans Langfuse et rattachée à la trace du traitement concerné afin d'auditer l'autorisation ou le refus d'un remboursement.
+
+INVEST : Independent, Negotiable, Valuable, Estimable, Small, Testable.
+
+### 9.3 Critères d'acceptation (Gherkin)
+
+#### Scenario — Détection d'une notification de remboursement
+
+Given le Worker consomme une notification dont le corps JSON contient le champ `action` avec la valeur `refund`
+When le traitement de cette notification est évalué
+Then le Worker identifie la notification comme une action de remboursement
+And le Worker suspend le traitement avant d'appliquer toute action de remboursement
+And le Worker demande une confirmation humaine sur un terminal interactif
+
+#### Scenario — Confirmation positive du remboursement
+
+Given le Worker a suspendu le traitement d'une notification de remboursement
+When l'opérateur répond `o` sur le terminal interactif
+Then le traitement continue
+And le remboursement est appliqué selon la logique métier de la notification
+And la décision humaine est enregistrée dans Langfuse comme succès
+And la décision est rattachée à la trace du traitement concerné
+
+#### Scenario — Refus du remboursement par l'opérateur
+
+Given le Worker a suspendu le traitement d'une notification de remboursement
+When l'opérateur répond `n` sur le terminal interactif
+Then l'action de remboursement est annulée
+And le traitement ne poursuit pas la demande de remboursement
+And la décision humaine est enregistrée dans Langfuse comme échec
+And la décision est rattachée à la trace du traitement concerné
+
+#### Scenario Outline — Valeurs limites de la confirmation
+
+Given le Worker suspend le traitement d'une notification de remboursement
+When l'opérateur répond avec la valeur <reponse>
+Then le système considère la décision comme <resultat>
+And la trace Langfuse reflète le statut <statut>
+And la trace Langfuse enregistre la réponse reçue <reponse>
+
+Examples:
+| reponse | resultat | statut |
+| o | autorisation du traitement | succès |
+| n | annulation de l'action | échec |
+| (vide) | annulation de l'action | échec |
+| invalide | annulation de l'action | échec |
+| fermeture_du_terminal | annulation de l'action | échec |
+
+### 9.4 Critères mesurables
+
+- Une notification est traitée comme un remboursement uniquement si son corps JSON contient le champ `action` avec la valeur exacte `refund`.
+- Avant toute application d'un remboursement, le Worker suspend le traitement et demande une confirmation humaine sur un terminal interactif.
+- Une réponse `o` autorise la poursuite du traitement.
+- Toute autre réponse, y compris vide, invalide ou une fermeture de terminal, annule l'action de remboursement et enregistre une décision `échec` dans Langfuse.
+- La décision humaine est enregistrée dans Langfuse et associée à la trace du traitement concerné.
+- La trace Langfuse contient le statut de décision et la réponse reçue.
+- Le statut Langfuse est `succès` lorsque la décision est autorisée et `échec` lorsque la décision est refusée.
+- La valeur `refund` dans le champ `action` n'est pas interprétée comme une action de remboursement si le corps JSON n'est pas valide ou si le champ `action` n'est pas présent avec cette valeur exacte.
+
+### 9.5 Hors périmètre du Sprint 3
+
+- Libellé standardisé de la question de confirmation interactive.
+- Montant plafond sans validation humaine.
+- Mécanisme automatique de remboursement sans confirmation humaine.
+- Validation de la conformité réglementaire du remboursement.
+- Remboursement hors contexte d'une notification portant le champ `action` avec la valeur `refund`.
+- Déduplication des décisions de remboursement dans Langfuse.
