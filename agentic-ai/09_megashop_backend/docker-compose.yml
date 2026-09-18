@@ -1,0 +1,51 @@
+services:
+  webhook:
+    build: .
+    command: node src/server.js
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      REDIS_URL: redis://redis:6379
+      QUEUE_NAME: payment_notifications
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_BASE_URL: ${GEMINI_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai/}
+      LLM_MODEL: ${LLM_MODEL:-gemini-3.6-flash}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-https://cloud.langfuse.com}
+      LANGFUSE_FLUSH_AT: ${LANGFUSE_FLUSH_AT:-1}
+      LANGFUSE_FLUSH_INTERVAL: ${LANGFUSE_FLUSH_INTERVAL:-1000}
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: node src/worker.js
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379
+      QUEUE_NAME: payment_notifications
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+      GEMINI_BASE_URL: ${GEMINI_BASE_URL:-https://generativelanguage.googleapis.com/v1beta/openai/}
+      LLM_MODEL: ${LLM_MODEL:-gemini-3.6-flash}
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY}
+      LANGFUSE_BASE_URL: ${LANGFUSE_BASE_URL:-https://cloud.langfuse.com}
+      LANGFUSE_FLUSH_AT: ${LANGFUSE_FLUSH_AT:-1}
+      LANGFUSE_FLUSH_INTERVAL: ${LANGFUSE_FLUSH_INTERVAL:-1000}
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5

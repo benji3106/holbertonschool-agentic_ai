@@ -1,11 +1,14 @@
 const express = require('express');
 const dotenv = require('dotenv');
+const Redis = require('ioredis');
+const { randomUUID } = require('node:crypto');
 
 dotenv.config();
 
 const MAX_REQUEST_BODY_SIZE = 1024 * 1024;
+const QUEUE_NAME = process.env.QUEUE_NAME || 'payment_notifications';
 
-const createApp = () => {
+const createApp = ({ publishNotification = async () => {} } = {}) => {
   const app = express();
 
   app.disable('x-powered-by');
@@ -74,9 +77,11 @@ const createApp = () => {
   // US-01 - Réception de notification de paiement
   // US-02 - Trace de réception
   // US-03 - Accusé de réception
-  app.all('/webhook', (req, res) => {
+  // US-04 - Mise en file immédiate de la notification
+  app.all('/webhook', async (req, res) => {
     const timestamp = new Date().toISOString();
     const rawBody = typeof req.rawBody === 'string' ? req.rawBody : '';
+    const notificationId = randomUUID();
     let parsedBody = null;
 
     if (rawBody.length > 0) {
@@ -87,12 +92,31 @@ const createApp = () => {
       }
     }
 
+    try {
+      await publishNotification({ id: notificationId, rawBody });
+    } catch (error) {
+      console.error(JSON.stringify({
+        timestamp,
+        method: req.method,
+        rawBody,
+        statusCode: 500,
+        notificationId,
+        error: error.message
+      }));
+
+      return res.status(500).json({
+        status: 'error',
+        message: 'Notification could not be queued'
+      });
+    }
+
     console.log(JSON.stringify({
       timestamp,
       method: req.method,
       rawBody,
       parsedBody,
       statusCode: 200,
+      notificationId,
       note: 'Notification de paiement reçue et acceptée sans blocage'
     }));
 
@@ -106,12 +130,20 @@ const createApp = () => {
 };
 
 const startServer = () => {
-  const app = createApp();
+  const redis = new Redis(process.env.REDIS_URL || 'redis://127.0.0.1:6379');
+  const app = createApp({
+    publishNotification: ({ id, rawBody }) => redis.lpush(
+      QUEUE_NAME,
+      JSON.stringify({ id, rawBody })
+    )
+  });
   const port = Number(process.env.PORT || 3000);
 
   app.listen(port, () => {
     console.log(`Webhook listening on port ${port}`);
   });
+
+  return { app, redis };
 };
 
 if (require.main === module) {
