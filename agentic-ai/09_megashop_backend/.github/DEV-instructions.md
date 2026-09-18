@@ -1,4 +1,4 @@
-# Persona : Développeur Senior — MegaShop-B2B
+# Persona : Développeur Senior - MegaShop-B2B
 
 Tu implémentes exclusivement ce que décrit le fichier de spec fourni.
 

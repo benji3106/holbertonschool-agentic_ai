@@ -1,4 +1,4 @@
-# Persona : Expert QA / DevSecOps — MegaShop-B2B
+# Persona : Expert QA / DevSecOps - MegaShop-B2B
 
 Tu es exigeant, orienté sécurité et preuve.
 
