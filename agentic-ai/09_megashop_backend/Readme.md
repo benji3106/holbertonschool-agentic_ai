@@ -1,4 +1,4 @@
-# MegaShop-B2B — L'Usine Logicielle Auditable
+# MegaShop-B2B L'Usine Logicielle Auditable
 
 Projet final du module Agentic AI. Trois fonctionnalités backend livrées sans écrire
 la logique métier à la main : le code est produit par une équipe de trois agents
@@ -50,7 +50,7 @@ de réutiliser les mêmes trois agents sur les trois sprints.
 
 ---
 
-## 3. Sprint 1 — Webhook de paiement
+## 3. Sprint 1 Webhook de paiement
 
 Route `POST /webhook`. Réponse `200 OK` immédiate, trace console complète
 (horodatage UTC, méthode, corps brut, statut).
@@ -72,7 +72,7 @@ parse dans un `try/catch`.
 
 ---
 
-## 4. Sprint 2 — Worker asynchrone
+## 4. Sprint 2 Worker asynchrone
 
 Le webhook ne fait plus aucun traitement lourd : il dépose dans Redis et répond.
 Le worker consomme avec `brpop` et produit une décision `conforme`, `non_conforme`
@@ -96,7 +96,7 @@ démarrage.
 
 ---
 
-## 5. Sprint 3 — Garde-fou HITL
+## 5. Sprint 3 Garde-fou HITL
 
 Une notification dont le corps contient `"action": "refund"` suspend le traitement.
 Le worker pose la question via `readline/promises` :
@@ -115,7 +115,7 @@ rattaché à la trace du traitement.
 | `o` | `remboursement_autorise` | succès | `True` ✅ |
 | `n` | `remboursement_annule` | echec | `False` ✅ |
 | `xyz` | `remboursement_annule` | echec | `False` ✅ |
-| (sans `action`) | décision LLM directe, aucune question | — | — ✅ |
+| (sans `action`) | décision LLM directe, aucune question |  |  ✅ |
 
 ---
 
@@ -209,7 +209,7 @@ du coût.
 
 **Économie structurelle** : les corps vides, non JSON et les remboursements
 n'appellent jamais le LLM. Ces cas ne coûtent rien, sans qu'aucune optimisation ait
-été nécessaire — c'est une conséquence des règles métier.
+été nécessaire, c'est une conséquence des règles métier.
 
 Exports dans `audit/` : traces, scores et capture du tableau de bord.
 
@@ -340,6 +340,6 @@ Corrections issues des audits QA, chacune vérifiée en exécution :
 
 Copilot en mode Agent, routage automatique. Les traces indiquaient
 `MAI-Code-1.1-Flash`. Les modèles alternatifs n'étaient pas accessibles avec
-l'abonnement utilisé, ce qui rend le choix du modèle non maîtrisable — une limite
+l'abonnement utilisé, ce qui rend le choix du modèle non maîtrisable, une limite
 à noter pour l'auditabilité, puisque le modèle ayant produit un code donné n'est
 connu qu'a posteriori.
